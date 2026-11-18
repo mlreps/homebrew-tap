@@ -53,7 +53,25 @@ class Mlreps < Formula
   test do
     assert_match "1.0.3", shell_output("#{bin}/mlreps --version")
     # ⚠ IT READS SOMETHING, NOT ONLY STARTS. A binary whose lib files went missing still prints a version.
-    (testpath/"a.ts").write("export const n = [1, 2].slice(0, 1).length;\n")
-    assert_match "1 files", shell_output("#{bin}/mlreps scan #{testpath}")
+    #
+    # ⚠ AND IT ASSERTS NO COUNT WITH A NOUN THAT AGREES WITH IT, which is what broke `brew test` on
+    # 1.0.3 (measured 2026-11-18). This block asserted `1 files` — correct output when it was written,
+    # and a pluralisation defect. The product learned to say "1 file"; the formula's test had pinned the
+    # bug, so a release that FIXED something failed its own tap test. Every string below is either the
+    # version or a count whose noun cannot change with the number.
+    #
+    # ⚠ TWO FILES, BECAUSE ONE PROVED NOTHING. With a single file both a correct install and a
+    # binary-installed-alone print "3 nodes · 0 connections" — measured on the 1.0.3 darwin-arm64
+    # artifact with lib.*.d.ts deleted. The comment in `install` above claimed this test caught that
+    # and it did not. Two files that call each other resolve to 100% only when the lib.*.d.ts beside the
+    # binary are readable; without them the same two calls fall to "resolvable by no static tool", which
+    # is the line `refute_match` watches and the only output that tells the two installs apart.
+    (testpath/"b.ts").write("export function twice(xs: number[]): number[] {\n  return xs.concat(xs);\n}\n")
+    (testpath/"a.ts").write("import { twice } from './b';\n\nexport function run(): number {\n  return twice([1, 2]).slice(0, 1).length;\n}\n")
+    out = shell_output("#{bin}/mlreps scan #{testpath}")
+    assert_match "5 nodes", out
+    assert_match "2 connections", out
+    assert_match "100% of resolvable call sites resolved", out
+    refute_match "resolvable by no static tool", out
   end
 end
