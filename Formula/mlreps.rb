@@ -9,29 +9,29 @@
 # Not submittable to homebrew-core: core wants a DFSG-compatible licence and a build from source, and this
 # is FSL-1.1-ALv2 shipping a native binary. It lives in mlreps/tap instead.
 class Mlreps < Formula
-  desc "Codebase auditor and guard: reads a repository and reports what a change to it would reach"
+  desc "Codebase auditor: reads a repository and reports what a change to it would reach"
   homepage "https://www.mlreps.com"
-  version "1.0.3"
+  version "1.1.0"
   license :cannot_represent # FSL-1.1-ALv2 — source-available, not OSI-approved
   on_macos do
     on_arm do
-      url "https://github.com/mlreps/cli/releases/download/v1.0.3/mlreps-1.0.3-darwin-arm64.tar.gz"
-      sha256 "42fe9090b7e4548851f861fa16e03b92bf8c683c8a045a30b6c4e3686e8d3edb"
+      url "https://github.com/mlreps/cli/releases/download/v1.1.0/mlreps-1.1.0-darwin-arm64.tar.gz"
+      sha256 "b5948a269f380fb7c9163e5e2ff02c658574a413e71be7160752440a90d9f7bc"
     end
     on_intel do
-      url "https://github.com/mlreps/cli/releases/download/v1.0.3/mlreps-1.0.3-darwin-x64.tar.gz"
-      sha256 "5e811f4a88b68c037afea4484a8b6b4e2eb8ccf43b90ec105824d28a2d72d727"
+      url "https://github.com/mlreps/cli/releases/download/v1.1.0/mlreps-1.1.0-darwin-x64.tar.gz"
+      sha256 "cba81c911ab3ed3fa5d51a7c6d5eb43823d015a3e4233ef55050947f43ed7677"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/mlreps/cli/releases/download/v1.0.3/mlreps-1.0.3-linux-arm64.tar.gz"
-      sha256 "83867b26f0e38358b502be3b47a62c0f0981de3634fe90daa9251ec7cb28ac4b"
+      url "https://github.com/mlreps/cli/releases/download/v1.1.0/mlreps-1.1.0-linux-arm64.tar.gz"
+      sha256 "760c0d7b4caaf410dda075842f108b93f7528ee4a34154995932d7a31dc8e82c"
     end
     on_intel do
-      url "https://github.com/mlreps/cli/releases/download/v1.0.3/mlreps-1.0.3-linux-x64.tar.gz"
-      sha256 "4cf12592a885657f79c1a1547939702b7101ff4082cf9f812641b268d7805d4b"
+      url "https://github.com/mlreps/cli/releases/download/v1.1.0/mlreps-1.1.0-linux-x64.tar.gz"
+      sha256 "6c9eeff0f35d1ff793ef307944ecd11ec0dcacea64caa78ca38a8f43fa5f17f5"
     end
   end
 
@@ -46,12 +46,13 @@ class Mlreps < Formula
   def caveats
     <<~EOS
       this formula serves macOS and Linux builds. There is no Windows build; the npm package runs there.
-      Nothing of your source leaves this machine unless you run: mlreps scan . --publish
+      Your source never leaves this machine — not with any flag. A report of the graph it built is
+      sent only with: mlreps scan . --upload-report, or on every scan once you agree to it in setup.
     EOS
   end
 
   test do
-    assert_match "1.0.3", shell_output("#{bin}/mlreps --version")
+    assert_match "1.1.0", shell_output("#{bin}/mlreps --version")
     # ⚠ IT READS SOMETHING, NOT ONLY STARTS. A binary whose lib files went missing still prints a version.
     #
     # ⚠ AND IT ASSERTS NO COUNT WITH A NOUN THAT AGREES WITH IT, which is what broke `brew test` on
